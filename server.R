@@ -9,13 +9,52 @@
 
 library(shiny)
 library(leaflet)
+library(dplyr)
+
+# Load data lists
+
+loadAC <- function(dataFile, acReg) {
+  
+  nullToNA <- function(x) {
+    x[sapply(x, is.null)] <- NA
+    return(x)
+  }
+  
+  acData <- read.csv(dataFile)
+  
+  fileList <- acData[acData$Reg == acReg,]$File
+  
+  for (i in 1:length(fileList)) {
+    
+    jsonData <- fromJSON(file = paste(fileList[i],".json", sep=""))
+    acLists <- jsonData$acList
+    
+    thisReg <- unlist(nullToNA(sapply(acLists,function(x) {x$Reg})))
+    
+    listPos <- which(thisReg==acReg & !is.na(thisReg))
+    
+    acPos <- acLists[[listPos]]$Cos
+    
+    if (!is.null(acPos)) {
+      acPos <- unlist(nullToNA(acPos))
+      if (!exists("acMatrix")) 
+        acMatrix <- matrix(acPos, ncol = 4, byrow = TRUE)
+      else
+        acMatrix <- rbind(acMatrix,matrix(acPos, ncol = 4, byrow = TRUE))
+    }
+    
+  }
+  
+  return(acMatrix)
+  
+}
 
 # Define server logic required to draw a histogram
 shinyServer(function(input, output) {
    output$regId <- renderText(input$reg)
    
    track <- eventReactive(input$recalc, {
-     cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
+      loadAC("~/R/working/FlightData/Main_database.csv","G-OZBF")
    }, ignoreNULL = FALSE)
    
    output$mapTrack <- renderLeaflet({
