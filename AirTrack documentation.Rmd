@@ -1,0 +1,82 @@
+---
+title: "AirTrack documentation"
+author: "Iain Morgan"
+date: "3/15/2018"
+output: html_document
+---
+
+## Introduction
+
+This document describes the "AirTrack" software package and covers all the basic information required for use.
+
+AirTrack is a simple piece of software that displays the tracks of aircraft over the ground, for specific aircraft and flights on specific days. AirTrack draws on the database of aircraft tracking information found at www.adsbexchange.com, which contains an extensive database and history of global aircraft tracks for several years.
+
+## How to use
+
+To start the app:
+
+AirTrack is a webb app hosted on RStudio's Shiny webservice. To open it, simply entyer the following URL in your browser:
+
+http://>>>>>
+
+AitTrack opens with a blank window on the right and a sidebar on the left, with two dropboxes and a button, which function as follows:
+
+- Type dropbox: In this box you can choose the type of aircraft you want to select, from a list of available aircraft types.
+
+- Registration dropbox: In this box, you can choose the registration of the aircraft you want to select, from a list of available aircraft registrations. Note that available registrations will only be shown if you have already selected an aircraft type in the "Type" dropbox.
+
+- Recalculate button: This button loads the aircraft track for the aircraft type and registration in the "Type" and "Registration" dropboxes. If either of these is not selected, the recalculate button will not work.
+
+To display an aircraft track, simply follow these steps:
+
+1 - Open AirTrack using the above URL.
+
+2 - Click on the "Type" dropbox and choose the type of aircraft you would like to see from the list of available type.
+
+3 - Wait a few seconds until a registration is shown in the "Registration" dropbox (the delay is for AirTrack to load the long list of available aircraft registrations). Once a registration is shown, click on the "Registration" dropbox and choose the aircraft registration you would like to see from the list of available registrations
+
+4 - Click on the "Recalculate" button and wait a few seconds while AirTrack retrieves the aircraft tracking data for the selected aircraft registration
+
+5 - AirTrack then displays the aircraft tracking data in the window on the right. The track will initially show against a blank background, while AitTrack loads the necessary maps from the internet
+
+To close AirTrack:
+
+AirTrack is closed by simply closing its browser tab or window.
+
+## Current capabilities
+
+AirTrack is currently limited to a subset of aircraft tracking data as follows:
+
+- Available date: 20th June 2016
+- Available time: 00:00 UTC until 06:59 UTC
+- Available aircraft types: A319, A320 and A321
+- Available aircraft registrations: All registrations up to "G-"
+## Potential capabilities
+
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

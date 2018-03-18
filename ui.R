@@ -9,22 +9,18 @@
 
 library(shiny)
 library(leaflet)
+library(dplyr)
 
 #sampleTrack <- as.data.frame(lat = c(10:15),long = c(10:15))
 
-inpData <- read.csv("~/R/working/FlightData/Main_database.csv", stringsAsFactors = FALSE)
+tList <- c("-","A319","A320","A321")
 
-tList <- distinct(as.data.frame(inpData$Type))
+regList <- "-"
 
-regList <- distinct(as.data.frame(inpData$Reg))
-regList <- as.data.frame(regList[order(regList),])
+origin <- "-"
 
-origin <- distinct(as.data.frame(inpData$From))
-origin <- as.data.frame(origin[order(origin),])
+hour <- "-"
 
-hour <- c("00:00 - 00:59",
-          "01:00 - 01:59",
-          "02:00 - 02:59")
 
 # Define UI for application that draws a histogram
 shinyUI(fluidPage(
@@ -36,16 +32,17 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
        selectInput("type","Aircraft type",tList),
-       selectInput("hour","Hour of the day",hour),
-       selectInput("origin","Departure airport",origin),
-       selectInput("reg","Registration",regList)
+  #     selectInput("hour","Hour of the day",hour),
+  #     selectInput("origin","Departure airport",origin),
+       selectInput("reg","Registration",regList),
+       actionButton("recalc","Recalculate")
     ),
     
     # Show a plot of the generated distribution
     mainPanel(
       textOutput("regId"),
       leafletOutput("mapTrack"),
-      actionButton("recalc","Recalculate")
+      plotOutput("profile", height = "150px")
     )
   )
 ))

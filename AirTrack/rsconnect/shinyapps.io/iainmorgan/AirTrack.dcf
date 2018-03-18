@@ -1,0 +1,12 @@
+name: AirTrack
+title: AirTrack
+username:
+account: iainmorgan
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 301565
+bundleId: 1274761
+url: https://iainmorgan.shinyapps.io/AirTrack/
+when: 1521384113.56679
+asMultiple: FALSE
+asStatic: FALSE

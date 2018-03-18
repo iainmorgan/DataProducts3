@@ -13,55 +13,65 @@ library(dplyr)
 
 # Load data lists
 
-loadAC <- function(dataFile, acReg) {
-  
-  nullToNA <- function(x) {
-    x[sapply(x, is.null)] <- NA
-    return(x)
-  }
-  
-  acData <- read.csv(dataFile)
-  
-  fileList <- acData[acData$Reg == acReg,]$File
-  
-  for (i in 1:length(fileList)) {
-    
-    jsonData <- fromJSON(file = paste(fileList[i],".json", sep=""))
-    acLists <- jsonData$acList
-    
-    thisReg <- unlist(nullToNA(sapply(acLists,function(x) {x$Reg})))
-    
-    listPos <- which(thisReg==acReg & !is.na(thisReg))
-    
-    acPos <- acLists[[listPos]]$Cos
-    
-    if (!is.null(acPos)) {
-      acPos <- unlist(nullToNA(acPos))
-      if (!exists("acMatrix")) 
-        acMatrix <- matrix(acPos, ncol = 4, byrow = TRUE)
-      else
-        acMatrix <- rbind(acMatrix,matrix(acPos, ncol = 4, byrow = TRUE))
-    }
-    
-  }
-  
-  return(acMatrix)
-  
-}
+inpData <- read.csv("~/Documents/R/DataProducts3/Reglist.csv", stringsAsFactors = FALSE)
+
+list319 <- distinct(as.data.frame(inpData[inpData[,1]=="A319",]))
+list319 <- list319[order(list319[,2]),]
+list319 <- list319[!is.na(list319[,1]),]
+
+list320 <- distinct(as.data.frame(inpData[inpData[,1]=="A320",]))
+list320 <- list320[order(list320[,2]),]
+list320 <- list320[!is.na(list320[,1]),]
+
+list321 <- distinct(as.data.frame(inpData[inpData[,1]=="A321",]))
+list321 <- list321[order(list321[,2]),]
+list321 <- list321[!is.na(list321[,1]),]
+
+inpList <- rbind(c("-","-"),
+                 list319,
+                 list320,
+                 list321)
+
+colnames(inpList) <- c("Type","Reg")
+
+# regList <- distinct(as.data.frame(inpData$Reg))
+# regList <- as.data.frame(regList[order(regList),])
+
+# origin <- distinct(as.data.frame(inpData$From))
+# origin <- as.data.frame(origin[order(origin),])
+
+# hour <- c("00:00 - 00:59",
+#          "01:00 - 01:59",
+#          "02:00 - 02:59")
+
+posData <- read.csv("~/Documents/R/DataProducts3/Posdata.csv", stringsAsFactors = FALSE)
+posData$Time <- as.POSIXct(as.numeric(posData$Time)/1000, origin="1970-01-01", tz="GMT")
 
 # Define server logic required to draw a histogram
-shinyServer(function(input, output) {
-   output$regId <- renderText(input$reg)
+shinyServer(function(input, output, session) {
+   output$regId <- renderText(paste("Flight track data for ",input$reg,sep=""))
+   
+   observeEvent(input$type, {
+     outList <- inpList[inpList$Type==input$type,2]
+     updateSelectInput(session, "reg", choices = outList)
+   })
    
    track <- eventReactive(input$recalc, {
-      loadAC("~/R/working/FlightData/Main_database.csv","G-OZBF")
+      posData[posData$Reg==input$reg,]
    }, ignoreNULL = FALSE)
    
    output$mapTrack <- renderLeaflet({
      leaflet() %>%
        addTiles() %>%
-       addMarkers(data = track(), 
-                  popup = paste(input$reg, input$origin, input$hour, sep = " ")) %>%
-       addPolylines(lng=track()[,1], lat=track()[,2])
+#       addMarkers(data = track(), 
+#                  popup = paste(track()[,1], " ", track()[,4], " ", track()[,5],"ft", sep = "")) %>%
+       addPolylines(lng=track()[,3], lat=track()[,2])
+   })
+   
+   output$profile <- renderPlot({
+     g <- ggplot(data = track(), aes(x = Time, y = Alt)) 
+     g <- g + geom_line()
+     g <- g + labs(title = "Flight profile", x = "Time", y = "Altitude (ft)")
+     g
    })
 })
